@@ -1,26 +1,65 @@
 @import "tailwindcss";
 
+/* 1. Define the Dark Mode Variant for Tailwind v4 */
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  /* 2. Map your CSS variables to Tailwind colors */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+
+  /* Adding zinc colors back if they aren't default in your setup */
+  --color-zinc-950: #09090b;
+}
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* 3. Manual override for when the .dark class is present */
+.dark {
+  --background: #09090b;
+  --foreground: #ededed;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  body {
+    /* Uses the variables defined above */
+    background-color: var(--background);
+    color: var(--foreground);
+    @apply transition-colors duration-300 antialiased;
+    font-family: Arial, sans-serif;
+  }
+
+  /* Target specific components to respond to the .dark class */
+  .dark body {
+    background-color: var(--background);
+    color: var(--foreground);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* Custom Loading Spinner Animation */
+.loading-spinner {
+  border: 3px solid rgba(0, 0, 0, 0.1);
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border-left-color: #2563eb;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Fix for ImageKit Upload input styling */
+input[type="file"]::file-selector-button {
+  @apply bg-blue-600 text-white px-4 py-2 rounded-md border-none cursor-pointer hover:bg-blue-700 transition-all mr-4;
 }
