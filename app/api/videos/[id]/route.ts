@@ -2,7 +2,7 @@ import { connectToDatabase } from "@/lib/db";
 import Video from "@/models/Video";
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
-import authOptions from "@/lib/auth-options";
+import { authoptions } from "@/lib/auth";
 
 // 🔐 DELETE VIDEO
 export async function DELETE(
@@ -12,7 +12,7 @@ export async function DELETE(
   try {
     await connectToDatabase();
 
-    const session = await getServerSession(authOptions);
+    const session = await getServerSession(authoptions);
 
     // ❌ Not logged in
     if (!session?.user?.id) {
@@ -46,7 +46,7 @@ export async function PUT(
   try {
     await connectToDatabase();
 
-    const session = await getServerSession(authOptions);
+    const session = await getServerSession(authoptions);
 
     // ❌ Not logged in
     if (!session?.user?.id) {
