@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
 import { apiClient } from "@/lib/api-client";
 import { IVideo } from "@/models/Video";
 import VideoCard from "./components/VideoCard";
@@ -8,6 +9,10 @@ import VideoCard from "./components/VideoCard";
 export default function Home() {
   const [videos, setVideos] = useState<IVideo[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // 🔐 Get logged in user
+  const { data: session } = useSession();
+  const currentUserId = session?.user?.id ?? null;
 
   useEffect(() => {
     const fetchVideos = async () => {
@@ -29,7 +34,7 @@ export default function Home() {
     setVideos((prev) => prev.filter((video) => video._id?.toString() !== id));
   };
 
-  // ✅ UPDATE HANDLER (NEW)
+  // ✅ UPDATE HANDLER
   const handleUpdateVideo = (updatedVideo: IVideo) => {
     setVideos((prev) =>
       prev.map((video) =>
@@ -67,6 +72,7 @@ export default function Home() {
               video={video}
               onDelete={handleDeleteVideo}
               onUpdate={handleUpdateVideo}
+              currentUserId={currentUserId}
             />
           ))}
         </div>
