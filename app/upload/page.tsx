@@ -4,8 +4,10 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { apiClient } from "@/lib/api-client";
 import FileUpload from "../components/FileUpload";
+import { useSession } from "next-auth/react"; // Assuming you use next-auth
 
 export default function UploadPage() {
+  const { data: session } = useSession();
   const [title, setTitle] = useState("");
   const [desc, setDesc] = useState("");
   const [videourl, setVideourl] = useState("");
@@ -21,7 +23,7 @@ export default function UploadPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // 1. Validation: Ensure files are finished uploading before submitting to DB
+    // 1. Validation
     if (!videourl || !thumbnailUrl) {
       alert(
         "Please wait for both the video and thumbnail to finish uploading.",
@@ -29,10 +31,17 @@ export default function UploadPage() {
       return;
     }
 
+    if (!session) {
+      alert("You must be logged in to upload videos.");
+      return;
+    }
+
     setIsPublishing(true);
 
     try {
-      // 2. API Call: Sending data to /api/videos
+      // 2. API Call
+      // We pass the data; if your API gets the user from the session,
+      // you don't need to explicitly pass userId here unless your backend requires it.
       await apiClient.createVideo({
         title,
         desc,
@@ -45,7 +54,6 @@ export default function UploadPage() {
       router.push("/");
       router.refresh();
     } catch (error: any) {
-      // 3. Error Handling: Displaying the specific server error (e.g., 404 or 500)
       console.error("Submission error:", error);
       alert(`Error: ${error.message || "Failed to create video"}`);
     } finally {

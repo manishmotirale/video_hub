@@ -6,22 +6,29 @@ export const VIDEO_DIMENSIONS = {
 } as const;
 
 export interface IVideo {
+  _id?: mongoose.Types.ObjectId | string; // Added for frontend/backend compatibility
   title: string;
   desc: string;
   videourl: string;
   thumbnailUrl: string;
-  userId: mongoose.Types.ObjectId;
+  userId: mongoose.Types.ObjectId | string; // Support both object and string
   controls?: boolean;
   transformation?: {
     height: number;
     width: number;
     quality?: number;
   };
+  createdAt?: Date;
+  updatedAt?: Date;
 }
+
+// ✨ NEW: This is what the frontend form actually sends
+// We Omit userId because the server usually gets it from the session
+export type VideoformData = Omit<IVideo, "_id" | "userId">;
 
 export type VideoDocument = mongoose.Document & IVideo;
 
-const videoSchema = new Schema(
+const videoSchema = new Schema<VideoDocument>(
   {
     title: { type: String, required: true },
     desc: { type: String, required: true },

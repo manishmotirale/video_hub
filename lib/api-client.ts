@@ -1,7 +1,8 @@
 import { IVideo } from "@/models/Video";
 
-// Removed "id" and "_id" to ensure the form data only contains what the user provides
-export type VideoformData = Omit<IVideo, "_id">;
+// ✨ Updated: Omit both _id AND userId.
+// The frontend shouldn't send the userId; the server gets it from the session.
+export type VideoformData = Omit<IVideo, "_id" | "userId">;
 
 type FetchOptions = {
   method?: "GET" | "POST" | "PUT" | "DELETE";
@@ -20,7 +21,6 @@ class ApiClient {
       ...headers,
     };
 
-    // Added a check to ensure we don't have double slashes
     const url = `/api/${endpoint.replace(/^\//, "")}`;
 
     const res = await fetch(url, {
@@ -36,9 +36,8 @@ class ApiClient {
         throw new Error(errorData.error || "Something went wrong");
       }
 
-      // If 404, this specifically tells you the folder path is wrong
       throw new Error(
-        `Server Error: ${res.status}. Could not find route at ${url}. Please verify your folder is named 'app/api/videos/route.ts'.`,
+        `Server Error: ${res.status}. Could not find route at ${url}.`,
       );
     }
 
@@ -49,7 +48,6 @@ class ApiClient {
     return this.fetch<IVideo[]>("videos");
   }
 
-  // Add these methods inside your ApiClient class in lib/api-client.ts
   async updateVideo(id: string, videoData: Partial<VideoformData>) {
     return this.fetch<IVideo>(`videos/${id}`, {
       method: "PUT",
