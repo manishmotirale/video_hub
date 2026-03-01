@@ -1,10 +1,9 @@
 import { connectToDatabase } from "@/lib/db";
 import Video from "@/models/Video";
-import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
-import { authoptions } from "@/lib/auth";
+import { authOptions } from "@/lib/auth";
+import { NextRequest, NextResponse } from "next/server";
 
-// 🔐 DELETE VIDEO
 export async function DELETE(
   request: NextRequest,
   { params }: { params: { id: string } },
@@ -12,9 +11,8 @@ export async function DELETE(
   try {
     await connectToDatabase();
 
-    const session = await getServerSession(authoptions);
+    const session = await getServerSession(authOptions);
 
-    // ❌ Not logged in
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -25,7 +23,6 @@ export async function DELETE(
       return NextResponse.json({ error: "Video not found" }, { status: 404 });
     }
 
-    // ❌ Not owner
     if (video.userId.toString() !== session.user.id) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
@@ -38,7 +35,6 @@ export async function DELETE(
   }
 }
 
-// 🔐 UPDATE VIDEO
 export async function PUT(
   request: NextRequest,
   { params }: { params: { id: string } },
@@ -46,9 +42,8 @@ export async function PUT(
   try {
     await connectToDatabase();
 
-    const session = await getServerSession(authoptions);
+    const session = await getServerSession(authOptions);
 
-    // ❌ Not logged in
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -59,7 +54,6 @@ export async function PUT(
       return NextResponse.json({ error: "Video not found" }, { status: 404 });
     }
 
-    // ❌ Not owner
     if (video.userId.toString() !== session.user.id) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }

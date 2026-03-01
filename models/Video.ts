@@ -6,12 +6,11 @@ export const VIDEO_DIMENSIONS = {
 } as const;
 
 export interface IVideo {
-  [x: string]: string | null;
-  _id?: mongoose.Types.ObjectId;
   title: string;
   desc: string;
   videourl: string;
   thumbnailUrl: string;
+  userId: mongoose.Types.ObjectId;
   controls?: boolean;
   transformation?: {
     height: number;
@@ -20,13 +19,23 @@ export interface IVideo {
   };
 }
 
-const videoSchema = new Schema<IVideo>(
+export type VideoDocument = mongoose.Document & IVideo;
+
+const videoSchema = new Schema(
   {
     title: { type: String, required: true },
     desc: { type: String, required: true },
     videourl: { type: String, required: true },
     thumbnailUrl: { type: String, required: true },
+
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+
     controls: { type: Boolean, default: true },
+
     transformation: {
       height: { type: Number, default: VIDEO_DIMENSIONS.height },
       width: { type: Number, default: VIDEO_DIMENSIONS.width },
@@ -36,7 +45,8 @@ const videoSchema = new Schema<IVideo>(
   { timestamps: true },
 );
 
-// FIXED: Changed models?.User to models?.Video
-const Video = models?.Video || model<IVideo>("Video", videoSchema);
+const Video =
+  (models.Video as mongoose.Model<VideoDocument>) ||
+  model<VideoDocument>("Video", videoSchema);
 
 export default Video;
